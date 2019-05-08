@@ -104,13 +104,34 @@ discordClient.on('message', (message) => {
   let streamNotCased = /^(\.|!)streams$/;
   let channel = discordClient.channels.get(config['discord-notifications-channel-id']); 
   let colorCommand = /^(\.|!)color/;
+  let roleCommand = /^(\.|!)role/;
+  let roleRCommand = /^(\.|!)removerole/;
   let clearCommand = /^(\.|!)clear$/;
+  let commandsCommand = /^(\.|!)commands$/;
+  if (message.channel.id === colorDiscordChannel.id && commandsCommand.test(message.content)) {
+    let colorOpts = "";
+    config["colors"].forEach(color => {
+      colorOpts = colorOpts + color + "/";
+    });
+    colorOpts = colorOpts.slice(0,-1);
+
+    message.channel.send("**Available Commands:** \n\n- !color [" + colorOpts + "] \n- !role [Bingo/Race] \n- !removerole [Bingo/Race]");
+    return;
+  }
   if (message.channel.id === colorDiscordChannel.id && colorCommand.test(message.content)) {
     _colorHandling(message);
     return;
   }
   if (message.channel.id === responseDiscordChannel.id && clearCommand.test(message.content)) {
     _clearChat(message.channel.id);
+    return;
+  }
+  if (message.channel.id === colorDiscordChannel.id && roleCommand.test(message.content)) {
+    _roleAdd(message);
+    return;
+  }
+  if (message.channel.id === colorDiscordChannel.id && roleRCommand.test(message.content)) {
+    _roleRemove(message);
     return;
   }
   if (message.channel.id === responseDiscordChannel.id && streamCommandRegex.test(message.content)) {
@@ -144,7 +165,86 @@ discordClient.on('message', (message) => {
     }
   }
 });
+function _roleAdd(message) {
+  if (message.content.length < 6) {
+    message.reply("No role specified!");
+    return;
+  }
+  var role = message.content.substr(6).toLowerCase();
 
+  switch(role) {
+    case "race":
+      role = "Race";
+    break;
+    case "bingo":
+      role = "Bingo";
+    break;
+  }
+
+  if (["admin", "administrator", "staff", "daddy", "mods", "mod", "moderator", "bot", "restreamer"].includes(role)) {
+    message.reply("Nice try smarty-pants. You wish ;)");
+    return;
+  }
+  if (!["Race", "Bingo"].includes(role)) {
+    message.reply("You didn't specify a valid role. Available Roles: Race, Bingo");
+    return;
+  }
+
+  let selectedRole = message.guild.roles.find("name", role);
+  var userToAdd = message.guild.members.find(member => {
+    if (member.user.tag === message.author.tag)
+      return true;
+    return false;
+  });
+
+  if (!userToAdd.roles.has(selectedRole.id))  {
+    userToAdd.addRole(selectedRole).catch(console.error);
+    message.reply("You just got the " + role + " role!");
+  } else {
+    message.reply("You already have this role!");
+    return;
+  }
+  return;
+}
+
+function _roleRemove(message) {
+  if (message.content.length < 12) {
+    message.reply("No role specified!");
+    return;
+  }
+  var role = message.content.substr(12).toLowerCase();
+
+  switch(role) {
+    case "race":
+      role = "Race";
+    break;
+    case "bingo":
+      role = "Bingo";
+    break;
+  }
+
+  if (["admin", "administrator", "staff", "daddy", "mods", "mod", "moderator", "bot", "restreamer"].includes(role)) {
+    message.reply("Nice try smarty-pants. You wish ;)");
+    return;
+  }
+  if (!["Race", "Bingo"].includes(role)) {
+    message.reply("You didn't specify a valid role. Available Roles: Race, Bingo");
+    return;
+  }
+
+  let selectedRole = message.guild.roles.find("name", role);
+  var userToRemove = message.guild.members.find(member => {
+    if (member.user.tag === message.author.tag)
+      return true;
+    return false;
+  });
+  if (userToRemove.roles.has(selectedRole.id)) {
+    userToRemove.removeRole(selectedRole);
+    message.reply(role + " role removed!");	
+  } else 
+    message.reply("You do not have the " + role + " role!");	
+  return;
+}
 function _colorHandling(message) {
   let color = message.content.split("color")[1].trim().toLowerCase();
   let colorIndex = config["colors"].indexOf(color);
