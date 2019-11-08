@@ -2,6 +2,8 @@ const Discord = require('discord.js');
 const discordClient = new Discord.Client();
 const twitch = require('./twitch-helix');
 const config = require('./config');
+const srcWRs = require('./src-wrs');
+
 class DiscordChannel {
   constructor (id) {
     this.id = id;
@@ -82,7 +84,7 @@ twitch.on('messageStreamDeleted', (stream) => {
     }))
     .catch(console.error);
 });
-discordClient.on('ready', () => {
+discordClient.on('ready', async () => {
   function failToSet(setting) {return (e) => {
     console.log('Failed to set ' + setting);
     console.log(e);
@@ -95,6 +97,25 @@ discordClient.on('ready', () => {
       "url": "https://www.twitch.tv/directory/game/The%20Legend%20of%20Zelda%3A%20Breath%20of%20the%20Wild"
     }
   }).catch(failToSet('presence'));
+  // get discord channel to announce WRs into
+  const wrChannel = discordClient.channels.get(config['discord-wr-channel-id']);
+  if (wrChannel) {
+    // if it exists, get all already announced WRs
+    const alreadyAnnouncedRunIDs = await srcWRs.getAlreadyAnnouncedRunIDs(wrChannel);
+    console.log(`found ${alreadyAnnouncedRunIDs.length} announced WRs`);
+    // start the loop
+    srcWRs.srcWRLoop(alreadyAnnouncedRunIDs);
+    // catch events when a new WR is posted
+    srcWRs.wrEmitter.on('newWR', run => {
+      srcWRs.formatSendRun(wrChannel, run)
+        .catch(e => {
+          console.log('error formatSendRun', e);
+        });
+    });
+  }
+  else {
+    console.error('channel not found!');
+  }
 });
 function toWeirdCase (pattern, str) {
   return str.split('').map((v, i) => pattern[i%7+1] === pattern[i%7+1].toLowerCase() ? v.toLowerCase() : v.toUpperCase()).join('');
