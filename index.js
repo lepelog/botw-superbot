@@ -45,16 +45,16 @@ twitch.on('messageStreamStarted', (stream) => {
     "color": 1369976,
     "timestamp": postDate,
     "footer": {
-      "icon_url": "http://images4.wikia.nocookie.net/__cb20120329024230/zelda/images/3/34/Fi_Artwork.png",
+      "icon_url": "http://img1.wikia.nocookie.net/__cb20130617152227/ssb/images/0/09/Link_(TLOZSS).png",
       "text": "Streaming SS"
     },
     "thumbnail": {
       "url": "https://cdn02.nintendo-europe.com/media/images/10_share_images/games_15/wii_24/SI_Wii_TheLegendOfZeldaSkywardSword_image1600w.jpg"
     },
     "author": {
-      "name": stream.name + " is now live on Twitch!",
+      "name": "Master " + stream.name + " is now live on Twitch!",
       "url": stream.url,
-      "icon_url": "http://images4.wikia.nocookie.net/__cb20120329024230/zelda/images/3/34/Fi_Artwork.png"
+      "icon_url": "http://img1.wikia.nocookie.net/__cb20130617152227/ssb/images/0/09/Link_(TLOZSS).png"
     }
   };
   channel.send({ embed }).catch((e) => {
@@ -103,12 +103,12 @@ discordClient.on('message', (message) => {
   let streamCommandRegex = /^(\.|!)streams$/i;
   let streamNotCased = /^(\.|!)streams$/;
   let channel = discordClient.channels.get(config['discord-notifications-channel-id']); 
-  let colorCommand = /^(\.|!)color/;
-  let roleCommand = /^(\.|!)role/;
-  let roleRCommand = /^(\.|!)removerole/;
+  //let colorCommand = /^(\.|!)color/;
+  //let roleCommand = /^(\.|!)role/;
+  //let roleRCommand = /^(\.|!)removerole/;
   let clearCommand = /^(\.|!)clear$/;
-  let commandsCommand = /^(\.|!)commands$/;
-  if (message.channel.id === colorDiscordChannel.id && commandsCommand.test(message.content)) {
+  //let commandsCommand = /^(\.|!)commands$/;
+  /*if (message.channel.id === colorDiscordChannel.id && commandsCommand.test(message.content)) {
     let colorOpts = "";
     config["colors"].forEach(color => {
       colorOpts = colorOpts + color + "/";
@@ -118,22 +118,23 @@ discordClient.on('message', (message) => {
     message.channel.send("**Available Commands:** \n\n- !color [" + colorOpts + "] \n- !role [Bingo/Race] \n- !removerole [Bingo/Race]");
     return;
   }
+  /*
   if (message.channel.id === colorDiscordChannel.id && colorCommand.test(message.content)) {
     _colorHandling(message);
     return;
-  }
+  }*/
   if (message.channel.id === responseDiscordChannel.id && clearCommand.test(message.content)) {
     _clearChat(message.channel.id);
     return;
   }
-  if (message.channel.id === colorDiscordChannel.id && roleCommand.test(message.content)) {
+  /*if (message.channel.id === colorDiscordChannel.id && roleCommand.test(message.content)) {
     _roleAdd(message);
     return;
   }
   if (message.channel.id === colorDiscordChannel.id && roleRCommand.test(message.content)) {
     _roleRemove(message);
     return;
-  }
+  }*/
   if (message.channel.id === responseDiscordChannel.id && streamCommandRegex.test(message.content)) {
     let applyWeirdCase = !streamNotCased.test(message.content);
     let streams = twitch.getStreams();
@@ -165,6 +166,7 @@ discordClient.on('message', (message) => {
     }
   }
 });
+/*
 function _roleAdd(message) {
   if (message.content.length < 6) {
     message.reply("No role specified!");
@@ -272,7 +274,7 @@ function _colorHandling(message) {
       }
     } else message.reply("Invalid Color!");
   }
-}
+}*/
 
 function _clearChat(textChannelID) {
 	let channel = discordClient.channels.get(textChannelID);
