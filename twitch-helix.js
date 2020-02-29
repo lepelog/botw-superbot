@@ -19,7 +19,7 @@ function streamLoop () {
   //console.log("'-------------------'");
   twitch.streams.getStreams({
     "game_id": [
-      "110758" //BoTW
+      "24324" //SS
     ],
     "first": 99,
     "type": 'live'
@@ -63,7 +63,7 @@ function streamLoop () {
             "url": 'https://www.twitch.tv/' + stream["login"],
             "name": stream["login"],
             "title": streams[stream["id"]]["title"],
-            "game": "Breath of the Wild",
+            "game": "Skyward Sword",
             // "id": stream["id"],
             // "display_name": stream["display_name"],
             // "login": stream["login"]

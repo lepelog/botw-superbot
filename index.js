@@ -45,16 +45,16 @@ twitch.on('messageStreamStarted', (stream) => {
     "color": 1369976,
     "timestamp": postDate,
     "footer": {
-      "icon_url": "https://gamepedia.cursecdn.com/zelda_gamepedia_en/thumb/3/33/BotW_Blue_Sheikah_Eye_Symbol.png/324px-BotW_Blue_Sheikah_Eye_Symbol.png",
-      "text": "Streaming BotW"
+      "icon_url": "http://images4.wikia.nocookie.net/__cb20120329024230/zelda/images/3/34/Fi_Artwork.png",
+      "text": "Streaming SS"
     },
     "thumbnail": {
-      "url": "https://sm.ign.com/ign_de/screenshot/default/breathofthewild3_yhvq.jpg"
+      "url": "https://cdn02.nintendo-europe.com/media/images/10_share_images/games_15/wii_24/SI_Wii_TheLegendOfZeldaSkywardSword_image1600w.jpg"
     },
     "author": {
       "name": stream.name + " is now live on Twitch!",
       "url": stream.url,
-      "icon_url": "https://gamepedia.cursecdn.com/zelda_gamepedia_en/thumb/3/33/BotW_Blue_Sheikah_Eye_Symbol.png/324px-BotW_Blue_Sheikah_Eye_Symbol.png"
+      "icon_url": "http://images4.wikia.nocookie.net/__cb20120329024230/zelda/images/3/34/Fi_Artwork.png"
     }
   };
   channel.send({ embed }).catch((e) => {
@@ -92,7 +92,7 @@ discordClient.on('ready', () => {
     "game": {
       "name": config['bot-currently-playing'],
       "type": "streaming",
-      "url": "https://www.twitch.tv/directory/game/The%20Legend%20of%20Zelda%3A%20Breath%20of%20the%20Wild"
+      "url": "https://www.twitch.tv/directory/game/The%20Legend%20of%20Zelda%3A%20Skyward%20Sword"
     }
   }).catch(failToSet('presence'));
 });
