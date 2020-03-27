@@ -115,7 +115,7 @@ discordClient.on('message', (message) => {
     });
     colorOpts = colorOpts.slice(0,-1);
 
-    message.channel.send("**Available Commands:** \n\n- !color [" + colorOpts + "] \n- !role [Bingo/Race] \n- !removerole [Bingo/Race]");
+    message.channel.send("**Available Commands:** \n\n- !color [" + colorOpts + "] \n- !role [Bingo/Race/Randomizer] \n- !removerole [Bingo/Race/Randomizer]");
     return;
   }
   if (message.channel.id === colorDiscordChannel.id && colorCommand.test(message.content)) {
@@ -179,18 +179,21 @@ function _roleAdd(message) {
     case "bingo":
       role = "Bingo";
     break;
+    case "randomizer":
+      role = "Randomizer";
+    break;
   }
 
   if (["admin", "administrator", "staff", "daddy", "mods", "mod", "moderator", "bot", "restreamer"].includes(role)) {
     message.reply("Nice try smarty-pants. You wish ;)");
     return;
   }
-  if (!["Race", "Bingo"].includes(role)) {
-    message.reply("You didn't specify a valid role. Available Roles: Race, Bingo");
+  if (!["Race", "Bingo", "Randomizer"].includes(role)) {
+    message.reply("You didn't specify a valid role. Available Roles: Race, Bingo, Randomizer");
     return;
   }
 
-  let selectedRole = message.guild.roles.find("name", role);
+  let selectedRole = message.guild.roles.find(x => x.name === role);
   var userToAdd = message.guild.members.find(member => {
     if (member.user.tag === message.author.tag)
       return true;
@@ -221,18 +224,21 @@ function _roleRemove(message) {
     case "bingo":
       role = "Bingo";
     break;
+    case "randomizer":
+      role = "Randomizer";
+    break;
   }
 
   if (["admin", "administrator", "staff", "daddy", "mods", "mod", "moderator", "bot", "restreamer"].includes(role)) {
     message.reply("Nice try smarty-pants. You wish ;)");
     return;
   }
-  if (!["Race", "Bingo"].includes(role)) {
-    message.reply("You didn't specify a valid role. Available Roles: Race, Bingo");
+  if (!["Race", "Bingo", "Randomizer"].includes(role)) {
+    message.reply("You didn't specify a valid role. Available Roles: Race, Bingo, Randomizer");
     return;
   }
 
-  let selectedRole = message.guild.roles.find("name", role);
+  let selectedRole = message.guild.roles.find(x => x.name === role);
   var userToRemove = message.guild.members.find(member => {
     if (member.user.tag === message.author.tag)
       return true;
@@ -246,6 +252,11 @@ function _roleRemove(message) {
   return;
 }
 function _colorHandling(message) {
+  if (!message.member.roles.find(x => x.name === "Runner") && !message.member.roles.find(x => x.name === "Staff")) {
+    message.reply("Sorry, but you need to have the Runner role to be able to select a custom color!");
+    return;
+  }
+
   let color = message.content.split("color")[1].trim().toLowerCase();
   let colorIndex = config["colors"].indexOf(color);
   if (color == "none") {
@@ -275,6 +286,9 @@ function _colorHandling(message) {
 }
 
 function _clearChat(textChannelID) {
+  if (!message.member.roles.find(x => x.name === "Staff"))
+    return;
+
 	let channel = discordClient.channels.get(textChannelID);
 
 	console.log("Fetch messages from " + channel.id);
