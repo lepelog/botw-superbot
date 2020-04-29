@@ -14,6 +14,9 @@ let tags = [
 ];//Speedrun, Randomizer, TAS
 
 async function getOauthToken() {
+  if (Date.now() < oauth_token_expires_at) {
+    return oauth_token;
+  }
   const resp = await rp.post("https://id.twitch.tv/oauth2/token", {
     body: {
       "client_id": config["twitch-client-id"],
