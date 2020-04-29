@@ -1,32 +1,79 @@
-const twitch = require('twitch-helix-api');
+const rp = require('request-promise');
 const EventEmitter = require('events');
 const config = require('./config');
 var game;
+let oauth_token = null;
+let oauth_token_expires_at = 0;
 const streamEmitter = new EventEmitter();
 let startup = false;
-twitch.clientID = config["twitch-client-id"];
 let streams = { };
 let tags = [
   "7cefbf30-4c3e-4aa7-99cd-70aabb662f27", 
   "2fd30cb8-f2e5-415d-9d42-1316cfa61367",
   "0b83a789-5f6a-45f0-b6a3-a56926b6f8b5",
 ];//Speedrun, Randomizer, TAS
+
+async function getOauthToken() {
+  if (Date.now() < oauth_token_expires_at) {
+    return oauth_token;
+  }
+  const resp = await rp.post("https://id.twitch.tv/oauth2/token", {
+    body: {
+      "client_id": config["twitch-client-id"],
+      "client_secret": config["twitch-client-secret"],
+      "grant_type": "refresh_token",
+      "refresh_token": config["twitch-refresh-token"],
+    },
+    json: true,
+  });
+  oauth_token = resp["access_token"];
+  if (!oauth_token) {
+    throw new Error("no oauth token returned!");
+  }
+  oauth_token_expires_at = Date.now() + 3500 * 1000;
+  return oauth_token;
+}
+
+function getStreams (token) {
+  return rp.get("https://api.twitch.tv/helix/streams", {
+    headers: {
+      "Client-ID": config["twitch-client-id"],
+      "Authorization": "OAuth "+token,
+    },
+    qs: {
+      "game_id": "110758", // botw
+      "first": 99,
+      "type": 'live',
+    },
+    json: true,
+  });
+}
+
+function getUsers (ids) {
+  return rp.get("https://api.twitch.tv/helix/users", {
+    headers: {
+      "Client-ID": config["twitch-client-id"],
+    },
+    qs: {
+      "id": ids,
+    },
+    json: true,
+  });
+}
+
 function streamLoop () {
   // Uncomment for logging.
   //console.log("Get streams...");
   //console.log(".--current streams--.");
   //console.log(streams)
   //console.log("'-------------------'");
-  twitch.streams.getStreams({
-    "game_id": [
-      "110758" //BoTW
-    ],
-    "first": 99,
-    "type": 'live'
+  getOauthToken().then((token) => {
+    return getStreams(token);
   }).then((data) => {
-    let res = data.response.data;
+    let res = data.data;
     let user_ids = [ ];
-    for (let stream of res) {
+    for (let i = 0;i<res.length;i++) {
+      let stream = res[i];
       if (stream.tag_ids) {
         var speedrun = tags.find(tag => {
           if (stream.tag_ids.includes(tag))
@@ -46,17 +93,16 @@ function streamLoop () {
       }      
     }
     if (user_ids.length > 0) {
-      return twitch.users.getUsers({
-        "id": user_ids
-      });
+      return getUsers(user_ids);
     }
     return null;
   }).then((data) => {
     if (data === null) {
       return;
     }
-    let res = data.response.data;
-    for (let stream of res) {
+    let res = data.data;
+    for (let i = 0;i<res.length;i++) {
+      let stream = res[i];
       if (typeof streams[stream["id"]]["url"] === 'undefined') {
         if (startup === true) {
           streamEmitter.emit('messageStreamStarted', {
