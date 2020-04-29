@@ -7,6 +7,8 @@ module.exports = {
   "bot-avatar-url": 'https://cdn.discordapp.com/avatars/574179086591590420/42331bf5233c7c7203a8e7d794199191.png',
   "bot-currently-playing": 'Breath of the Wild',
   "twitch-client-id": "twitch client token",
+  "twitch-client-secret": "twitch client secret",
+  "twitch-refresh-token": "twitch oauth refresh token",
   "discord-token": "discord bot token",
   "colors": ["red", "orange", "yellow", "green", "blue", "purple", "none"]
 };
