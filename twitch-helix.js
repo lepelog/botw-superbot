@@ -21,16 +21,19 @@ async function getOauthToken() {
     body: {
       "client_id": config["twitch-client-id"],
       "client_secret": config["twitch-client-secret"],
-      "grant_type": "refresh_token",
-      "refresh_token": config["twitch-refresh-token"],
+      "grant_type": "client_credentials",
     },
     json: true,
   });
   oauth_token = resp["access_token"];
+  let expiresIn = resp["expires_in"];
   if (!oauth_token) {
     throw new Error("no oauth token returned!");
   }
-  oauth_token_expires_at = Date.now() + 3500 * 1000;
+  if (!expiresIn) {
+    throw new Error("no expires in");
+  }
+  oauth_token_expires_at = Date.now() + (expiresIn - 100) * 1000; // set expire date 100 seconds earlier for safety
   return oauth_token;
 }
 

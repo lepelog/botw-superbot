@@ -8,7 +8,6 @@ module.exports = {
   "bot-currently-playing": 'Breath of the Wild',
   "twitch-client-id": "twitch client token",
   "twitch-client-secret": "twitch client secret",
-  "twitch-refresh-token": "twitch oauth refresh token",
   "discord-token": "discord bot token",
   "colors": ["red", "orange", "yellow", "green", "blue", "purple", "none"]
 };
