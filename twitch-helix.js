@@ -37,11 +37,11 @@ async function getOauthToken() {
   return oauth_token;
 }
 
-function getStreams (token) {
+function getStreams () {
   return rp.get("https://api.twitch.tv/helix/streams", {
     headers: {
       "Client-ID": config["twitch-client-id"],
-      "Authorization": "Bearer "+token,
+      "Authorization": "Bearer "+oauth_token,
     },
     qs: {
       "game_id": "24324", // ss
@@ -56,6 +56,7 @@ function getUsers (ids) {
   return rp.get("https://api.twitch.tv/helix/users", {
     headers: {
       "Client-ID": config["twitch-client-id"],
+      "Authorization": "Bearer "+oauth_token,
     },
     qs: {
       "id": ids,
@@ -70,8 +71,8 @@ function streamLoop () {
   //console.log(".--current streams--.");
   //console.log(streams)
   //console.log("'-------------------'");
-  getOauthToken().then((token) => {
-    return getStreams(token);
+  getOauthToken().then(() => {
+    return getStreams();
   }).then((data) => {
     let res = data.data;
     let user_ids = [ ];
