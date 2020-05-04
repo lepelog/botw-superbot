@@ -41,7 +41,7 @@ function getStreams (token) {
   return rp.get("https://api.twitch.tv/helix/streams", {
     headers: {
       "Client-ID": config["twitch-client-id"],
-      "Authorization": "OAuth "+token,
+      "Authorization": "Bearer "+token,
     },
     qs: {
       "game_id": "24324", // ss
